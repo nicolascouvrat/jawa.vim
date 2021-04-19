@@ -3,12 +3,43 @@
 " Args:
 "   file (str): a path to a Java file
 function! jawa#util#ClassName(file)
+  call s:assertJavaFile(a:file)
+
+  return fnamemodify(a:file, ":t:r")
+endfunction
+
+" PackageName returns the name of package in which this java file belongs
+"
+" Args:
+"   file (str): a path to a Java file
+function! jawa#util#PackageName(file)
+  call s:assertJavaFile(a:file)
+
+  let relativized = s:relativize(fnamemodify(a:file, ":h"), "src/main/java")
+  return substitute(relativized, "/", ".", "g")
+endfunction
+
+function! s:assertJavaFile(file)
   if !s:isJavaFile(a:file)
     throw "Not a java file: " . a:file
   endif
+endfunction
+" relativize constructs a relative path between a given file and a given path
+"
+" If path is completely contained in file, this function will assume that everything that comes
+" before also matches. For example, if file is 'a/b/c/d/myfile' and path 'b/c', it will assume path
+" was in fact 'a/b/c' and return 'd/myfile'
+"
+" Args:
+"   file (str): a path to a file
+"   path (str): a path to relativize file against
+function! s:relativize(file, path)
+  if a:file !~ '^.*' . a:path . '.*$'
+    throw a:file . " cannot be relativized against " . a:path
+  endif
 
-  let filename = split(a:file, "/")[-1]
-  return split(filename, "\\.")[0]
+  let relativized = substitute(a:file, '.*' . a:path . '/', "", "")
+  return relativized
 endfunction
 
 " isJavaFile returns true if file points to a Java file
@@ -68,12 +99,12 @@ function! jawa#util#MvCurrent(destination)
   redraw!
 endfunction
 
-" CurrentFile returns the current file name
-function! jawa#util#CurrentFileName()
-  return expand("%:t")
+" CurrentFile returns the current file 
+function! jawa#util#CurrentFile()
+  return expand("%")
 endfunction
 
-" CurrentDirectory returns the directory of the current file
+" CurrentFile returns the directory of the current file 
 function! jawa#util#CurrentDirectory()
   return expand("%:p:h")
 endfunction
