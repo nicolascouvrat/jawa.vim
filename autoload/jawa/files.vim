@@ -1,3 +1,4 @@
+" TODO: clean search pattern and restore cursor
 function! jawa#files#Rename(new_class)
   let current_file = jawa#util#CurrentFile()
   let old_class = jawa#util#ClassName(current_file)

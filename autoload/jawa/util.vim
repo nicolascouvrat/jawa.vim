@@ -15,7 +15,12 @@ endfunction
 function! jawa#util#PackageName(file)
   call s:assertJavaFile(a:file)
 
-  let relativized = s:relativize(fnamemodify(a:file, ":h"), "src/main/java")
+  try
+    let relativized = s:relativize(fnamemodify(a:file, ":h"), "src/main/java")
+  catch
+    let relativized = s:relativize(fnamemodify(a:file, ":h"), "src/test/java")
+  endtry
+
   return substitute(relativized, "/", ".", "g")
 endfunction
 
